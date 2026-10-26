@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Arsip;
 use App\Models\Kategori;
 use App\Models\User;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -41,24 +40,6 @@ class LaporanController extends Controller
         ));
     }
 
-    public function pdf(Request $request)
-    {
-        $filter = $this->validasi($request);
-
-        $arsips = $this->base($filter)
-            ->with(['kategori', 'pembuat'])
-            ->orderByDesc('tanggal_arsip')
-            ->orderByDesc('id')
-            ->get();
-
-        $infoFilter = $this->infoFilter($filter);
-
-        $pdf = Pdf::loadView('laporan.pdf', compact('arsips', 'infoFilter'))
-            ->setPaper('a4', 'landscape');
-
-        return $pdf->download('laporan-arsip-' . now()->format('Ymd-His') . '.pdf');
-    }
-
     private function validasi(Request $request): array
     {
         return $request->validate([
@@ -86,7 +67,7 @@ class LaporanController extends Controller
             });
     }
 
-    // Teks ringkasan filter, dipakai di tampilan cetak dan PDF
+    // Teks ringkasan filter, dipakai di kop saat dicetak
     private function infoFilter(array $f): array
     {
         $info = [];

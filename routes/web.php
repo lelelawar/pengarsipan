@@ -28,8 +28,6 @@ Route::middleware('auth')->group(function () {
 
     // Khusus Admin
     Route::middleware('role:admin')->group(function () {
-        Route::get('/laporan/pdf', [LaporanController::class, 'pdf'])->name('laporan.pdf');
-
         Route::resource('akun', UserController::class)
             ->parameters(['akun' => 'user'])
             ->except(['show']);

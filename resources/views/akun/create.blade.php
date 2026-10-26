@@ -13,7 +13,7 @@
             <form method="POST" action="{{ route('akun.store') }}">
                 @csrf
 
-                @include('akun._form', ['user' => null])
+                @include('akun.form', ['user' => null])
 
                 <div class="mt-4 d-flex gap-2 form-actions">
                     <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i> Simpan</button>

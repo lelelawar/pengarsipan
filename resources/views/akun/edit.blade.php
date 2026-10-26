@@ -14,7 +14,7 @@
                 @csrf
                 @method('PUT')
 
-                @include('akun._form')
+                @include('akun.form')
 
                 <div class="mt-4 d-flex gap-2 form-actions">
                     <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i> Simpan Perubahan</button>

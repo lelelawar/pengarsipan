@@ -56,4 +56,13 @@
             </dl>
         </div>
     </div>
+      @if($arsip->file_path)
+        <div class="card card-soft mt-3 no-print">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">Pratinjau PDF</h5>
+                <iframe src="{{ asset('storage/' . $arsip->file_path) }}"
+                        class="w-100 border rounded" style="height: 70vh;"></iframe>
+            </div>
+        </div>
+    @endif
 @endsection

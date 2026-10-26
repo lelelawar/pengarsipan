@@ -8,15 +8,21 @@
         <p class="text-muted mb-0">{{ $arsip->nomor_arsip }}</p>
     </div>
 
+    @if($errors->any())
+        <div class="alert alert-danger">
+            Ada isian yang belum benar, cek kolom yang berwarna merah.
+        </div>
+    @endif
+
     <div class="card card-soft">
         <div class="card-body">
             <form method="POST" action="{{ route('arsip.update', $arsip) }}" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
-                @include('arsip._form')
+                @include('arsip.form')
 
-                <div class="mt-4 d-flex gap-2 from-actions">
+                <div class="mt-4 d-flex gap-2 form-actions">
                     <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i> Simpan Perubahan</button>
                     <a href="{{ route('arsip.show', $arsip) }}" class="btn btn-light border">Batal</a>
                 </div>

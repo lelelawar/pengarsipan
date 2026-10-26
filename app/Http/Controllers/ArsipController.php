@@ -6,6 +6,7 @@ use App\Models\ActivityLog;
 use App\Models\Arsip;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class ArsipController extends Controller
@@ -50,21 +51,23 @@ class ArsipController extends Controller
             'kategori_id'   => ['required', 'exists:kategoris,id'],
             'tanggal_arsip' => ['required', 'date'],
             'deskripsi'     => ['nullable', 'string'],
-            'file'          => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png,doc,docx', 'max:5120'],
+            'file'          => ['required', 'file', 'mimes:pdf', 'max:5120'],
+        ], [
+            'file.required' => 'File arsip (PDF) wajib diupload.',
+            'file.mimes'    => 'File harus berformat PDF.',
+            'file.max'      => 'Ukuran file maksimal 5 MB.',
+            'file.uploaded' => 'Upload gagal. Cek ukuran file (maks 5 MB) dan coba lagi.',
         ]);
 
-        if ($request->hasFile('file')) {
-            $data['file_path'] = $request->file('file')->store('arsip', 'public');
-        }
-        unset($data['file']);
-
+        $data['file_path']  = $request->file('file')->store('arsip', 'public');
         $data['created_by'] = auth()->id();
+        unset($data['file']);
 
         $arsip = Arsip::create($data);
 
         ActivityLog::catat('tambah', "Menambah arsip {$arsip->nomor_arsip} - {$arsip->judul}");
 
-        return redirect()->route('arsip.index')->with('success', 'Arsip berhasil ditambahkan.');
+        return redirect()->route('arsip.show', $arsip)->with('success', 'Arsip berhasil ditambahkan.');
     }
 
     public function show(Arsip $arsip)
@@ -95,12 +98,16 @@ class ArsipController extends Controller
             'kategori_id'   => ['required', 'exists:kategoris,id'],
             'tanggal_arsip' => ['required', 'date'],
             'deskripsi'     => ['nullable', 'string'],
-            'file'          => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png,doc,docx', 'max:5120'],
+            'file'          => ['nullable', 'file', 'mimes:pdf', 'max:5120'],
+        ], [
+            'file.mimes'    => 'File harus berformat PDF.',
+            'file.max'      => 'Ukuran file maksimal 5 MB.',
+            'file.uploaded' => 'Upload gagal. Cek ukuran file (maks 5 MB) dan coba lagi.',
         ]);
 
         if ($request->hasFile('file')) {
             if ($arsip->file_path) {
-                \Storage::disk('public')->delete($arsip->file_path);
+                Storage::disk('public')->delete($arsip->file_path);
             }
             $data['file_path'] = $request->file('file')->store('arsip', 'public');
         }
@@ -117,7 +124,7 @@ class ArsipController extends Controller
     {
         $this->authorize('delete', $arsip);
 
-        $arsip->delete(); // soft delete, file tetap disimpan
+        $arsip->delete(); // soft delete, file PDF tetap disimpan di storage
 
         ActivityLog::catat('hapus', "Menghapus arsip {$arsip->nomor_arsip} - {$arsip->judul}");
 

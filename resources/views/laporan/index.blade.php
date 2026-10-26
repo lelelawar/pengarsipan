@@ -6,19 +6,11 @@
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4 no-print">
         <div>
             <h3 class="fw-bold mb-1">Laporan Arsip</h3>
-            <p class="text-muted mb-0">Filter data, lalu cetak atau export PDF.</p>
+            <p class="text-muted mb-0">Filter data, lalu cetak.</p>
         </div>
-        <div class="d-flex flex-wrap gap-2">
-            <button type="button" class="btn btn-outline-secondary btn-mobile-full" onclick="window.print()">
-                <i class="bi bi-printer me-1"></i> Cetak
-            </button>
-
-            @if(auth()->user()->isAdmin())
-                <a href="{{ route('laporan.pdf', request()->query()) }}" class="btn btn-outline-danger btn-mobile-full">
-                    <i class="bi bi-filetype-pdf me-1"></i> Export PDF
-                </a>
-            @endif
-        </div>
+        <button type="button" class="btn btn-outline-secondary btn-mobile-full" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i> Cetak
+        </button>
     </div>
 
     {{-- Kop khusus saat dicetak --}}

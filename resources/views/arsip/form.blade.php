@@ -8,7 +8,7 @@
 
     <div class="col-md-6">
         <label class="form-label fw-medium">Tanggal Arsip</label>
-        <input type="date" name="tanggal_arsip" value="{{ old('tanggal_arsip', $arsip?->tanggal_arsip?->format('Y-m-d')) }}"
+        <input type="date" name="tanggal_arsip" value="{{ old('tanggal_arsip', $arsip?->tanggal_arsip?->format('Y-m-d') ?? now()->format('Y-m-d')) }}"
                class="form-control @error('tanggal_arsip') is-invalid @enderror" required>
         @error('tanggal_arsip') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
@@ -40,16 +40,18 @@
     </div>
 
     <div class="col-12">
-        <label class="form-label fw-medium">File Arsip</label>
+        <label class="form-label fw-medium">File Arsip (PDF)</label>
         <input type="file" name="file" class="form-control @error('file') is-invalid @enderror"
-               accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
-        <div class="form-text">PDF, JPG, PNG, DOC, DOCX. Maksimal 5 MB.</div>
+               accept="application/pdf,.pdf" {{ $arsip ? '' : 'required' }}>
+        <div class="form-text">Hanya file PDF. Maksimal 5 MB.</div>
         @error('file') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
 
         @if($arsip?->file_path)
             <div class="mt-2 small">
                 File saat ini:
-                <a href="{{ asset('storage/' . $arsip->file_path) }}" target="_blank">{{ basename($arsip->file_path) }}</a>
+                <a href="{{ asset('storage/' . $arsip->file_path) }}" target="_blank">
+                    <i class="bi bi-file-earmark-pdf"></i> {{ basename($arsip->file_path) }}
+                </a>
                 <span class="text-muted">(kosongkan kalau tidak mau mengganti)</span>
             </div>
         @endif
