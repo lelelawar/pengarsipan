@@ -58,7 +58,7 @@
         $salam = $jam < 11 ? 'Selamat pagi' : ($jam < 15 ? 'Selamat siang' : ($jam < 18 ? 'Selamat sore' : 'Selamat malam'));
         $admin = auth()->user()->isAdmin();
         $maks  = max(1, $perKategori->max('arsips_count'));
-        $warnaAksi = ['tambah' => '#10b981', 'edit' => '#6366f1', 'hapus' => '#ef4444'];
+        $warnaAksi = ['tambah' => '#10b981', 'edit' => '#6366f1', 'hapus' => '#ef4444', 'pulihkan' => '#0ea5e9', 'permanen' => '#6b7280'];
     @endphp
 
     <div class="hero mb-4">
@@ -190,28 +190,48 @@
                 @endforelse
             </div>
 
-            @if($admin)
-                <div class="card-soft p-3 p-md-4">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5 class="fw-bold mb-0">Aktivitas Terbaru</h5>
+            <div class="card-soft p-3 p-md-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="fw-bold mb-0">Aktivitas Terbaru</h5>
+                    @if($admin)
                         <a href="{{ route('log.index') }}" class="small text-decoration-none fw-medium">Semua</a>
-                    </div>
-
-                    <ul class="feed">
-                        @forelse($logTerbaru as $log)
-                            <li>
-                                <span class="dot" style="background: {{ $warnaAksi[$log->aksi] ?? '#9ca3af' }}"></span>
-                                <div>
-                                    <div class="txt">{{ $log->deskripsi }}</div>
-                                    <div class="meta">{{ $log->user->nama ?? '-' }} · {{ $log->created_at->locale('id')->diffForHumans() }}</div>
-                                </div>
-                            </li>
-                        @empty
-                            <li><span class="text-muted small">Belum ada aktivitas.</span></li>
-                        @endforelse
-                    </ul>
+                    @endif
                 </div>
-            @endif
+
+                <ul class="feed">
+                    @forelse($logTerbaru as $log)
+                        <li>
+                            <span class="dot" style="background: {{ $warnaAksi[$log->aksi] ?? '#9ca3af' }}"></span>
+                            <div>
+                                <div class="txt">{{ $log->deskripsi }}</div>
+                                <div class="meta">{{ $log->user->nama ?? '-' }} · {{ $log->created_at->locale('id')->diffForHumans() }}</div>
+                            </div>
+                        </li>
+                    @empty
+                        <li><span class="text-muted small">Belum ada aktivitas.</span></li>
+                    @endforelse
+                </ul>
+            </div>
+
+            @php
+                $ukuranFormat = fn (int $b) => $b >= 1073741824
+                    ? round($b / 1073741824, 2) . ' GB'
+                    : ($b >= 1048576 ? round($b / 1048576, 1) . ' MB' : round($b / 1024) . ' KB');
+                $persenStorage = min(100, round($ukuranTerpakai / $kuota * 100, 1));
+            @endphp
+
+            <div class="card-soft p-3 p-md-4">
+                <h5 class="fw-bold mb-3">Penyimpanan</h5>
+
+                <div class="d-flex justify-content-between small mb-1">
+                    <span class="fw-medium">{{ $ukuranFormat($ukuranTerpakai) }}</span>
+                    <span class="text-muted">dari {{ $ukuranFormat($kuota) }}</span>
+                </div>
+                <div class="progress" style="height: 8px">
+                    <div class="progress-bar" style="width: {{ $persenStorage }}%"></div>
+                </div>
+                <div class="small text-muted mt-2">{{ $jumlahBerkas }} file tersimpan ({{ $persenStorage }}% terpakai)</div>
+            </div>
         </div>
     </div>
 @endsection

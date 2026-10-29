@@ -22,4 +22,14 @@ class ActivityLog extends Model
             'deskripsi' => $deskripsi,
         ]);
     }
+
+    // Hanya aktivitas arsip (buat anggota biasa). Tambahin pola baru di sini kalau ada jenis log arsip lain.
+    public function scopeArsipSaja($query)
+    {
+        return $query->where(function ($w) {
+            foreach (['Menambah arsip %', 'Mengubah arsip %', 'Menghapus arsip %', 'Memulihkan arsip %'] as $pola) {
+                $w->orWhere('deskripsi', 'like', $pola);
+            }
+        });
+    }
 }

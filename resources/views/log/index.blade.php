@@ -17,7 +17,7 @@
                 <div class="col-md-4">
                     <select name="aksi" class="form-select">
                         <option value="">Semua aksi</option>
-                        @foreach(['tambah' => 'Tambah', 'edit' => 'Edit', 'hapus' => 'Hapus'] as $nilai => $label)
+                        @foreach(['tambah' => 'Tambah', 'edit' => 'Edit', 'hapus' => 'Hapus', 'pulihkan' => 'Pulihkan', 'permanen' => 'Permanen'] as $nilai => $label)
                             <option value="{{ $nilai }}" @selected(request('aksi') === $nilai)>{{ $label }}</option>
                         @endforeach
                     </select>
@@ -44,7 +44,7 @@
                     <tbody>
                         @forelse($logs as $log)
                             @php
-                                $warna = ['tambah' => 'success', 'edit' => 'primary', 'hapus' => 'danger'][$log->aksi] ?? 'secondary';
+                                $warna = ['tambah' => 'success', 'edit' => 'primary', 'hapus' => 'danger', 'pulihkan' => 'info', 'permanen' => 'dark'][$log->aksi] ?? 'secondary';
                             @endphp
                             <tr>
                                 <td data-label="Waktu" class="text-nowrap">{{ $log->created_at->format('d M Y, H:i') }}</td>

@@ -74,13 +74,20 @@
         .topbar { display: none; }
 
         .page-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-        .page-top .date { color: var(--muted); font-size: .88rem; }
         .user-chip {
             display: flex; align-items: center; gap: .6rem;
             background: #fff; border: 1px solid var(--border);
             padding: .3rem .85rem .3rem .3rem; border-radius: 2rem; font-size: .88rem; font-weight: 500;
         }
         .user-chip .avatar { width: 32px; height: 32px; font-size: .85rem; }
+
+        .top-search { position: relative; flex: 1; max-width: 460px; margin-right: 1rem; }
+        .top-search i { position: absolute; left: .95rem; top: 50%; transform: translateY(-50%); color: #9ca3af; }
+        .top-search input {
+            width: 100%; border: 1px solid var(--border); background: #fff; outline: none;
+            border-radius: 2rem; padding: .55rem 1rem .55rem 2.6rem; font-size: .9rem;
+        }
+        .top-search input:focus { border-color: #818cf8; box-shadow: 0 0 0 .22rem rgba(99, 102, 241, .15); }
 
         /* ---------- Komponen global ---------- */
         .card-soft {
@@ -212,6 +219,13 @@
             <a href="{{ route('kategori.index') }}" class="nav-link {{ request()->routeIs('kategori.*') ? 'active' : '' }}">
                 <i class="bi bi-tags"></i> Kategori
             </a>
+                        @php $jumlahSampah = \App\Models\Arsip::onlyTrashed()->count(); @endphp
+            <a href="{{ route('sampah.index') }}" class="nav-link {{ request()->routeIs('sampah.*') ? 'active' : '' }}">
+                <i class="bi bi-trash3"></i> Sampah
+                @if($jumlahSampah > 0)
+                    <span class="badge rounded-pill ms-auto" style="background: rgba(255, 255, 255, .2)">{{ $jumlahSampah }}</span>
+                @endif
+            </a>
             <a href="{{ route('log.index') }}" class="nav-link {{ request()->routeIs('log.*') ? 'active' : '' }}">
                 <i class="bi bi-clock-history"></i> Log Aktivitas
             </a>
@@ -244,10 +258,20 @@
     </div>
 
     <div class="page-top no-print">
-        <div class="date"><i class="bi bi-calendar3 me-1"></i> {{ now()->locale('id')->translatedFormat('l, d F Y') }}</div>
-        <div class="user-chip">
-            <div class="avatar">{{ strtoupper(substr(auth()->user()->nama, 0, 1)) }}</div>
-            <span>{{ auth()->user()->nama }}</span>
+        <form method="GET" action="{{ route('arsip.index') }}" class="top-search">
+            <i class="bi bi-search"></i>
+            <input type="text" name="q" value="{{ request()->routeIs('arsip.index') ? request('q') : '' }}"
+                   placeholder="Cari arsip berdasarkan judul atau nomor..." aria-label="Cari arsip">
+        </form>
+
+        <div class="d-flex align-items-center gap-2">
+            <a href="{{ route('arsip.create') }}" class="btn btn-primary btn-sm px-3">
+                <i class="bi bi-cloud-arrow-up me-1"></i> Upload
+            </a>
+            <div class="user-chip">
+                <div class="avatar">{{ strtoupper(substr(auth()->user()->nama, 0, 1)) }}</div>
+                <span>{{ auth()->user()->nama }}</span>
+            </div>
         </div>
     </div>
 

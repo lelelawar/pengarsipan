@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\LogController;
+use App\Http\Controllers\SampahController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -23,7 +24,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
 
-    // Pratinjau dan unduh PDF (semua user login)
+    // Pratinjau dan unduh file (semua user login)
     Route::get('arsip/{arsip}/preview', [ArsipController::class, 'preview'])->name('arsip.preview');
     Route::get('arsip/{arsip}/download', [ArsipController::class, 'download'])->name('arsip.download');
 
@@ -32,6 +33,11 @@ Route::middleware('auth')->group(function () {
 
     // Khusus Admin
     Route::middleware('role:admin')->group(function () {
+        Route::get('sampah', [SampahController::class, 'index'])->name('sampah.index');
+        Route::post('sampah/{id}/pulihkan', [SampahController::class, 'pulihkan'])->name('sampah.pulihkan');
+        Route::delete('sampah/{id}', [SampahController::class, 'hapusPermanen'])->name('sampah.hapus');
+        Route::delete('sampah', [SampahController::class, 'kosongkan'])->name('sampah.kosongkan');
+
         Route::resource('akun', UserController::class)
             ->parameters(['akun' => 'user'])
             ->except(['show']);

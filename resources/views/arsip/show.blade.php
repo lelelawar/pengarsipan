@@ -15,7 +15,7 @@
 
             @if($arsip->file_path)
                 <a href="{{ route('arsip.download', $arsip) }}" class="btn btn-success">
-                    <i class="bi bi-download me-1"></i> Unduh PDF
+                    <i class="bi bi-download me-1"></i> Unduh
                 </a>
             @endif
 
@@ -48,21 +48,32 @@
                 <dt class="col-sm-3">Dibuat Oleh</dt>
                 <dd class="col-sm-9">{{ $arsip->pembuat->nama ?? '-' }}</dd>
 
+                <dt class="col-sm-3">Diunggah</dt>
+                <dd class="col-sm-9">{{ $arsip->created_at->format('d F Y, H:i') }}</dd>
+
                 <dt class="col-sm-3">Deskripsi</dt>
                 <dd class="col-sm-9">{{ $arsip->deskripsi ?: '-' }}</dd>
 
                 <dt class="col-sm-3">File</dt>
                 <dd class="col-sm-9">
                     @if($arsip->file_path)
-                        <div class="d-flex flex-wrap gap-2 no-print">
-                            <a href="{{ route('arsip.preview', $arsip) }}" target="_blank" class="btn btn-sm btn-outline-info">
-                                <i class="bi bi-file-earmark-pdf me-1"></i> Buka Pratinjau
-                            </a>
-                            <a href="{{ route('arsip.download', $arsip) }}" class="btn btn-sm btn-outline-success">
-                                <i class="bi bi-download me-1"></i> Unduh
-                            </a>
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <span class="badge text-bg-light border fs-6 fw-medium">
+                                <i class="bi {{ $arsip->ikon }} me-1" style="color: {{ $arsip->warna_ikon }}"></i>
+                                {{ strtoupper($arsip->ekstensi) }}
+                            </span>
+
+                            <span class="no-print d-flex flex-wrap gap-2">
+                                @if($arsip->bisa_pratinjau)
+                                    <a href="{{ route('arsip.preview', $arsip) }}" target="_blank" class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-box-arrow-up-right me-1"></i> Buka di tab baru
+                                    </a>
+                                @endif
+                                <a href="{{ route('arsip.download', $arsip) }}" class="btn btn-sm btn-outline-success">
+                                    <i class="bi bi-download me-1"></i> Unduh
+                                </a>
+                            </span>
                         </div>
-                        <span class="d-none d-print-inline">Terlampir (PDF)</span>
                     @else
                         <span class="text-muted">Tidak ada file.</span>
                     @endif
@@ -74,22 +85,38 @@
     @if($arsip->file_path)
         <div class="card card-soft mt-3 no-print">
             <div class="card-body">
-                <h5 class="fw-bold mb-3">Pratinjau PDF</h5>
+                <h5 class="fw-bold mb-3">Pratinjau</h5>
 
-                {{-- Laptop/tablet: PDF tertanam --}}
-                <iframe src="{{ route('arsip.preview', $arsip) }}"
-                        class="w-100 border rounded d-none d-md-block"
-                        style="height: 75vh;"
-                        title="Pratinjau {{ $arsip->judul }}"></iframe>
+                @if($arsip->jenis_file === 'pdf')
+                    {{-- Laptop/tablet: PDF tertanam --}}
+                    <iframe src="{{ route('arsip.preview', $arsip) }}"
+                            class="w-100 border rounded d-none d-md-block"
+                            style="height: 75vh;"
+                            title="Pratinjau {{ $arsip->judul }}"></iframe>
 
-                {{-- HP: browser sering tidak bisa nampilin PDF di dalam halaman --}}
-                <div class="d-md-none text-center py-4 text-muted">
-                    <i class="bi bi-file-earmark-pdf fs-1 d-block mb-2 text-danger"></i>
-                    <div class="mb-3">Pratinjau tertanam tidak tersedia di layar kecil.</div>
-                    <a href="{{ route('arsip.preview', $arsip) }}" target="_blank" class="btn btn-outline-info">
-                        <i class="bi bi-box-arrow-up-right me-1"></i> Buka PDF
-                    </a>
-                </div>
+                    {{-- HP: browser sering tidak bisa nampilin PDF di dalam halaman --}}
+                    <div class="d-md-none text-center py-4 text-muted">
+                        <i class="bi bi-file-earmark-pdf fs-1 d-block mb-2 text-danger"></i>
+                        <div class="mb-3">Pratinjau tertanam tidak tersedia di layar kecil.</div>
+                        <a href="{{ route('arsip.preview', $arsip) }}" target="_blank" class="btn btn-outline-info">
+                            <i class="bi bi-box-arrow-up-right me-1"></i> Buka PDF
+                        </a>
+                    </div>
+
+                @elseif($arsip->jenis_file === 'gambar')
+                    <img src="{{ route('arsip.preview', $arsip) }}" alt="{{ $arsip->judul }}"
+                         class="img-fluid rounded border d-block mx-auto" style="max-height: 75vh;">
+
+                @else
+                    {{-- Sisa file format lama (misal hasil tes sebelumnya) --}}
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi {{ $arsip->ikon }} d-block mb-2" style="font-size: 3rem; color: {{ $arsip->warna_ikon }}"></i>
+                        <div class="mb-3">Format {{ strtoupper($arsip->ekstensi) }} tidak bisa dipratinjau di browser. Silakan unduh untuk membukanya.</div>
+                        <a href="{{ route('arsip.download', $arsip) }}" class="btn btn-success">
+                            <i class="bi bi-download me-1"></i> Unduh File
+                        </a>
+                    </div>
+                @endif
             </div>
         </div>
     @endif

@@ -5,7 +5,7 @@
 @section('content')
     <div class="mb-4">
         <h3 class="fw-bold mb-1">Tambah Arsip</h3>
-        <p class="text-muted mb-0">Isi data arsip dan upload file PDF-nya.</p>
+        <p class="text-muted mb-0">Isi data arsip, lalu tarik file-nya ke area upload.</p>
     </div>
 
     @if($errors->any())
