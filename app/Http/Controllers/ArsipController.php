@@ -7,6 +7,7 @@ use App\Models\Arsip;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class ArsipController extends Controller
@@ -129,5 +130,51 @@ class ArsipController extends Controller
         ActivityLog::catat('hapus', "Menghapus arsip {$arsip->nomor_arsip} - {$arsip->judul}");
 
         return redirect()->route('arsip.index')->with('success', 'Arsip berhasil dihapus.');
+    }
+
+    /**
+     * Buka PDF langsung di browser (tab baru).
+     */
+    public function preview(Arsip $arsip)
+    {
+        $this->authorize('view', $arsip);
+        $this->pastikanFileAda($arsip);
+
+        return Storage::disk('public')->response(
+            $arsip->file_path,
+            $this->namaFile($arsip),
+            ['Content-Type' => 'application/pdf'],
+            'inline'
+        );
+    }
+
+    /**
+     * Unduh PDF dengan nama file yang rapi.
+     */
+    public function download(Arsip $arsip)
+    {
+        $this->authorize('view', $arsip);
+        $this->pastikanFileAda($arsip);
+
+        return Storage::disk('public')->download(
+            $arsip->file_path,
+            $this->namaFile($arsip),
+            ['Content-Type' => 'application/pdf']
+        );
+    }
+
+    private function pastikanFileAda(Arsip $arsip): void
+    {
+        abort_unless(
+            $arsip->file_path && Storage::disk('public')->exists($arsip->file_path),
+            404,
+            'File arsip tidak ditemukan.'
+        );
+    }
+
+    // Contoh hasil: ars-2026-001-surat-undangan-rapat.pdf
+    private function namaFile(Arsip $arsip): string
+    {
+        return Str::slug($arsip->nomor_arsip . ' ' . $arsip->judul) . '.pdf';
     }
 }

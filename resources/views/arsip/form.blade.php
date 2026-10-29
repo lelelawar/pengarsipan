@@ -49,7 +49,7 @@
         @if($arsip?->file_path)
             <div class="mt-2 small">
                 File saat ini:
-                <a href="{{ asset('storage/' . $arsip->file_path) }}" target="_blank">
+                        <a href="{{ route('arsip.preview', $arsip) }}" target="_blank">
                     <i class="bi bi-file-earmark-pdf"></i> {{ basename($arsip->file_path) }}
                 </a>
                 <span class="text-muted">(kosongkan kalau tidak mau mengganti)</span>

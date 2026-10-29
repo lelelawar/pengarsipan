@@ -23,6 +23,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
 
+    // Pratinjau dan unduh PDF (semua user login)
+    Route::get('arsip/{arsip}/preview', [ArsipController::class, 'preview'])->name('arsip.preview');
+    Route::get('arsip/{arsip}/download', [ArsipController::class, 'download'])->name('arsip.download');
+
     // Hak akses detail (edit milik sendiri, hapus admin) diatur di ArsipPolicy
     Route::resource('arsip', ArsipController::class);
 

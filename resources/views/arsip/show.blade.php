@@ -8,13 +8,21 @@
             <h3 class="fw-bold mb-1">Detail Arsip</h3>
             <p class="text-muted mb-0">{{ $arsip->nomor_arsip }}</p>
         </div>
-        <div class="d-flex gap-2">
+        <div class="d-flex flex-wrap gap-2">
             <a href="{{ route('arsip.index') }}" class="btn btn-light border">
                 <i class="bi bi-arrow-left me-1"></i> Kembali
             </a>
+
+            @if($arsip->file_path)
+                <a href="{{ route('arsip.download', $arsip) }}" class="btn btn-success">
+                    <i class="bi bi-download me-1"></i> Unduh PDF
+                </a>
+            @endif
+
             <button type="button" class="btn btn-outline-secondary" onclick="window.print()">
                 <i class="bi bi-printer me-1"></i> Cetak
             </button>
+
             @can('update', $arsip)
                 <a href="{{ route('arsip.edit', $arsip) }}" class="btn btn-primary">
                     <i class="bi bi-pencil me-1"></i> Edit
@@ -46,9 +54,15 @@
                 <dt class="col-sm-3">File</dt>
                 <dd class="col-sm-9">
                     @if($arsip->file_path)
-                        <a href="{{ asset('storage/' . $arsip->file_path) }}" target="_blank" class="no-print">
-                            <i class="bi bi-paperclip"></i> {{ basename($arsip->file_path) }}
-                        </a>
+                        <div class="d-flex flex-wrap gap-2 no-print">
+                            <a href="{{ route('arsip.preview', $arsip) }}" target="_blank" class="btn btn-sm btn-outline-info">
+                                <i class="bi bi-file-earmark-pdf me-1"></i> Buka Pratinjau
+                            </a>
+                            <a href="{{ route('arsip.download', $arsip) }}" class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-download me-1"></i> Unduh
+                            </a>
+                        </div>
+                        <span class="d-none d-print-inline">Terlampir (PDF)</span>
                     @else
                         <span class="text-muted">Tidak ada file.</span>
                     @endif
@@ -56,12 +70,26 @@
             </dl>
         </div>
     </div>
-      @if($arsip->file_path)
+
+    @if($arsip->file_path)
         <div class="card card-soft mt-3 no-print">
             <div class="card-body">
                 <h5 class="fw-bold mb-3">Pratinjau PDF</h5>
-                <iframe src="{{ asset('storage/' . $arsip->file_path) }}"
-                        class="w-100 border rounded" style="height: 70vh;"></iframe>
+
+                {{-- Laptop/tablet: PDF tertanam --}}
+                <iframe src="{{ route('arsip.preview', $arsip) }}"
+                        class="w-100 border rounded d-none d-md-block"
+                        style="height: 75vh;"
+                        title="Pratinjau {{ $arsip->judul }}"></iframe>
+
+                {{-- HP: browser sering tidak bisa nampilin PDF di dalam halaman --}}
+                <div class="d-md-none text-center py-4 text-muted">
+                    <i class="bi bi-file-earmark-pdf fs-1 d-block mb-2 text-danger"></i>
+                    <div class="mb-3">Pratinjau tertanam tidak tersedia di layar kecil.</div>
+                    <a href="{{ route('arsip.preview', $arsip) }}" target="_blank" class="btn btn-outline-info">
+                        <i class="bi bi-box-arrow-up-right me-1"></i> Buka PDF
+                    </a>
+                </div>
             </div>
         </div>
     @endif

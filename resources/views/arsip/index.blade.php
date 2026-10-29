@@ -57,9 +57,18 @@
                                 <td data-label="Tanggal">{{ $arsip->tanggal_arsip->format('d M Y') }}</td>
                                 <td data-label="Dibuat Oleh">{{ $arsip->pembuat->nama ?? '-' }}</td>
                                 <td data-label="Aksi" class="text-end text-nowrap">
-                                    <a href="{{ route('arsip.show', $arsip) }}" class="btn btn-sm btn-outline-secondary" title="Lihat">
+                                    <a href="{{ route('arsip.show', $arsip) }}" class="btn btn-sm btn-outline-secondary" title="Detail">
                                         <i class="bi bi-eye"></i>
                                     </a>
+
+                                    @if($arsip->file_path)
+                                        <a href="{{ route('arsip.preview', $arsip) }}" target="_blank" class="btn btn-sm btn-outline-info" title="Pratinjau PDF">
+                                            <i class="bi bi-file-earmark-pdf"></i>
+                                        </a>
+                                        <a href="{{ route('arsip.download', $arsip) }}" class="btn btn-sm btn-outline-success" title="Unduh PDF">
+                                            <i class="bi bi-download"></i>
+                                        </a>
+                                    @endif
 
                                     @can('update', $arsip)
                                         <a href="{{ route('arsip.edit', $arsip) }}" class="btn btn-sm btn-outline-primary" title="Edit">
