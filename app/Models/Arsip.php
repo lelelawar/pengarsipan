@@ -4,7 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use LogicException;
 
 class Arsip extends Model
 {
@@ -13,12 +15,35 @@ class Arsip extends Model
     // Lama arsip disimpan di Sampah sebelum dihapus permanen
     public const MASA_SAMPAH_HARI = 30;
 
+    public const DISK_FILE_DIIZINKAN = ['public', 'arsip_private'];
+
     protected static function booted(): void
     {
+        static::saving(function (Arsip $arsip) {
+            if ($arsip->file_disk !== null && !in_array($arsip->file_disk, self::DISK_FILE_DIIZINKAN, true)) {
+                throw new LogicException('Disk file arsip tidak diizinkan.');
+            }
+        });
+
         // Hapus permanen = file fisiknya ikut dihapus dari storage
         static::forceDeleted(function (Arsip $arsip) {
             if ($arsip->file_path) {
-                Storage::disk('public')->delete($arsip->file_path);
+                try {
+                    if (!Storage::disk($arsip->diskArsip())->delete($arsip->file_path)) {
+                        Log::warning('File arsip tidak terhapus setelah force delete.', [
+                            'arsip_id' => $arsip->id,
+                            'file_disk' => $arsip->file_disk,
+                            'file_path' => $arsip->file_path,
+                        ]);
+                    }
+                } catch (\Throwable $e) {
+                    Log::error('Gagal menghapus file arsip permanen.', [
+                        'arsip_id' => $arsip->id,
+                        'file_disk' => $arsip->file_disk,
+                        'file_path' => $arsip->file_path,
+                        'exception' => $e->getMessage(),
+                    ]);
+                }
             }
         });
     }
@@ -44,10 +69,22 @@ class Arsip extends Model
 
     protected $fillable = [
         'nomor_arsip', 'judul', 'kategori_id',
-        'tanggal_arsip', 'deskripsi', 'file_path', 'created_by',
+        'tanggal_arsip', 'deskripsi', 'file_path', 'file_disk', 'created_by',
     ];
 
     protected $casts = ['tanggal_arsip' => 'date'];
+
+    /** Disk file arsip; null pada record lama diperlakukan sebagai public. */
+    public function diskArsip(): string
+    {
+        $disk = $this->file_disk ?: 'public';
+
+        if (!in_array($disk, self::DISK_FILE_DIIZINKAN, true)) {
+            throw new LogicException('Disk file arsip tidak diizinkan.');
+        }
+
+        return $disk;
+    }
 
     public static function semuaEkstensi(): array
     {

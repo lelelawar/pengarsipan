@@ -34,11 +34,24 @@ class DashboardController extends Controller
         }
         $logTerbaru = $logQuery->take(6)->get();
 
-        // Pemakaian storage (semua file di folder arsip, termasuk arsip yang sudah dihapus)
-        $disk           = Storage::disk('public');
-        $berkas         = $disk->allFiles('arsip');
-        $ukuranTerpakai = collect($berkas)->sum(fn ($f) => $disk->size($f));
-        $jumlahBerkas   = count($berkas);
+        // Hitung file yang direferensikan record, termasuk Sampah. Salinan migrasi
+        // yang belum direferensikan tidak menggandakan angka arsip pada widget.
+        $berkas = Arsip::withTrashed()->whereNotNull('file_path')->get(['file_path', 'file_disk']);
+        $terhitung = [];
+        foreach ($berkas as $arsip) {
+            $diskNama = $arsip->diskArsip();
+            $kunci = $diskNama . ':' . $arsip->file_path;
+            if (isset($terhitung[$kunci])) {
+                continue;
+            }
+
+            $disk = Storage::disk($diskNama);
+            if ($disk->exists($arsip->file_path)) {
+                $terhitung[$kunci] = $disk->size($arsip->file_path);
+            }
+        }
+        $ukuranTerpakai = array_sum($terhitung);
+        $jumlahBerkas   = count($terhitung);
         $kuota          = 1024 * 1024 * 1024; // 1 GB, ubah sesuai kebutuhan
 
         return view('dashboard', compact(
