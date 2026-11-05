@@ -61,6 +61,7 @@
                             <th>Kategori</th>
                             <th>Tanggal</th>
                             <th>Dibuat Oleh</th>
+                            <th>Favorit</th>
                             <th class="text-end">Aksi</th>
                         </tr>
                     </thead>
@@ -77,6 +78,21 @@
                                 <td data-label="Kategori"><span class="badge text-bg-light border">{{ $arsip->kategori->nama }}</span></td>
                                 <td data-label="Tanggal">{{ $arsip->tanggal_arsip->format('d M Y') }}</td>
                                 <td data-label="Dibuat Oleh">{{ $arsip->pembuat->nama ?? '-' }}</td>
+                                <td data-label="Favorit">
+                                    <form action="{{ route($arsip->dipin ? 'arsip.unpin' : 'arsip.pin', $arsip) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @if($arsip->dipin)
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-warning" title="Hapus dari Favorit">
+                                                <i class="bi bi-star-fill me-1"></i> Unpin
+                                            </button>
+                                        @else
+                                            <button type="submit" class="btn btn-sm btn-outline-warning" title="Pin ke Favorit">
+                                                <i class="bi bi-star me-1"></i> Pin
+                                            </button>
+                                        @endif
+                                    </form>
+                                </td>
                                 <td data-label="Aksi" class="text-end text-nowrap">
                                     <a href="{{ route('arsip.show', $arsip) }}" class="btn btn-sm btn-outline-secondary" title="Detail">
                                         <i class="bi bi-eye"></i>
@@ -113,7 +129,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center text-muted py-4">Belum ada arsip yang cocok.</td>
+                                <td colspan="7" class="text-center text-muted py-4">Belum ada arsip yang cocok.</td>
                             </tr>
                         @endforelse
                     </tbody>

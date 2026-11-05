@@ -202,6 +202,10 @@
             <i class="bi bi-folder2-open"></i> Daftar Arsip
         </a>
 
+        <a href="{{ route('favorit.index') }}" class="nav-link {{ request()->routeIs('favorit.*') ? 'active' : '' }}">
+            <i class="bi bi-star"></i> Favorit
+        </a>
+
         <a href="{{ route('arsip.create') }}" class="nav-link {{ request()->routeIs('arsip.create') ? 'active' : '' }}">
             <i class="bi bi-file-earmark-plus"></i> Tambahkan Arsip
         </a>

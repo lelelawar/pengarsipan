@@ -13,6 +13,20 @@
                 <i class="bi bi-arrow-left me-1"></i> Kembali
             </a>
 
+            <form action="{{ route($arsip->dipin ? 'arsip.unpin' : 'arsip.pin', $arsip) }}" method="POST" class="d-inline">
+                @csrf
+                @if($arsip->dipin)
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-warning" title="Hapus dari Favorit">
+                        <i class="bi bi-star-fill me-1"></i> Unpin
+                    </button>
+                @else
+                    <button type="submit" class="btn btn-outline-warning" title="Pin ke Favorit">
+                        <i class="bi bi-star me-1"></i> Pin ke Favorit
+                    </button>
+                @endif
+            </form>
+
             @if($arsip->file_path)
                 <a href="{{ route('arsip.download', $arsip) }}" class="btn btn-success">
                     <i class="bi bi-download me-1"></i> Unduh

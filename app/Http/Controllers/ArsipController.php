@@ -28,6 +28,7 @@ class ArsipController extends Controller
         $this->authorize('viewAny', Arsip::class);
 
         $arsips = Arsip::with(['kategori', 'pembuat'])
+            ->withExists(['dipinOleh as dipin' => fn ($query) => $query->where('users.id', auth()->id())])
             ->when($request->q, function ($query, $cari) {
                 $query->where(function ($w) use ($cari) {
                     $w->where('judul', 'like', "%{$cari}%")
@@ -98,6 +99,10 @@ class ArsipController extends Controller
         $this->authorize('view', $arsip);
 
         $arsip->load(['kategori', 'pembuat']);
+        $arsip->setAttribute(
+            'dipin',
+            $arsip->dipinOleh()->where('users.id', auth()->id())->exists()
+        );
 
         return view('arsip.show', compact('arsip'));
     }

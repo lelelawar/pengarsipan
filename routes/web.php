@@ -3,6 +3,7 @@
 use App\Http\Controllers\ArsipController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FavoritController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\LogController;
@@ -23,6 +24,11 @@ Route::middleware('auth')->group(function () {
     // Admin dan User
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+    Route::get('/favorit', [FavoritController::class, 'index'])->name('favorit.index');
+
+    // Route khusus arsip harus berada sebelum Route::resource('arsip').
+    Route::post('arsip/{arsip}/pin', [FavoritController::class, 'pin'])->name('arsip.pin');
+    Route::delete('arsip/{arsip}/pin', [FavoritController::class, 'unpin'])->name('arsip.unpin');
 
     // Pratinjau dan unduh file (semua user login)
     Route::get('arsip/{arsip}/preview', [ArsipController::class, 'preview'])->name('arsip.preview');

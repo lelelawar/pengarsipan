@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -99,6 +100,11 @@ class Arsip extends Model
     public function pembuat()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function dipinOleh(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'arsip_pin', 'arsip_id', 'user_id');
     }
 
     // Ekstensi file, misal "pdf"
