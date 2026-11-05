@@ -33,10 +33,10 @@ php artisan arsip:bersihkan-sampah
 | **Cara menulis kode frontend** (Blade, kelas CSS, tabel, form, responsif) | `docs/guidelines/frontend.md` |
 | **Keamanan, upload, akses dan penghapusan file** | `docs/guidelines/security-and-storage.md` |
 | Alasan di balik keputusan, hal yang sudah ditolak | `docs/decisions.md` |
-| Error umum dan cara mengatasinya | `docs/troubleshooting.md` |
-| Backup dan pemulihan | `docs/backup-and-recovery.md` |
 | Rencana dan hasil uji | `docs/testing.md` |
-| Rangkuman proses pengembangan (konteks chat baru) | `docs/history.md` |
+
+Dokumen `backup-and-recovery.md`, `troubleshooting.md`, dan `history.md` belum
+tersedia di workspace ini; jangan merujuknya sebagai sumber fakta sampai dibuat.
 
 ## Sebelum Menulis Kode
 
@@ -77,7 +77,7 @@ Jangan ditambahkan tanpa diminta: export PDF/Excel dari laporan, upload Word/Exc
 
 - Status Private Storage terakhir diverifikasi 5 November 2026: 5 dari 5 record memakai `arsip_private`; 3 salinan fisik lama masih ada di disk `public`. GET dan HEAD URL arsip langsung menghasilkan 403 pada host Laragon yang diuji. Detail dan batas cakupan uji ada di `docs/guidelines/security-and-storage.md`; jangan menganggap konfigurasi web server lain sudah terlindungi.
 - Cek `RouteServiceProvider::HOME`: sebaiknya `'/dashboard'`, supaya user yang sudah login lalu membuka `/login` tidak kena 404.
-- Belum ada tes otomatis. Kalau menambahkan, pakai database terpisah (lihat `docs/testing.md`), karena `RefreshDatabase` menghapus tabel.
+- Tes otomatis tersedia di `tests/Feature` dan `tests/Unit`. Jalankan tes yang memakai `RefreshDatabase` dengan SQLite in-memory sesuai `docs/testing.md`; jangan arahkan tes ke database pengembangan.
 - Warning kuning di VS Code (`__blade_extends`, `withQueryString()`) adalah false positive ekstensi PHP, abaikan.
 
 ## Cara Bekerja dengan Pemilik Proyek

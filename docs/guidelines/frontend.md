@@ -85,7 +85,7 @@ Variabel warna ada di `:root` layout: `--primary` (`#4f46e5`), `--primary-soft`,
 | Unduh, pulihkan | `btn btn-sm btn-outline-success` | `bi-download`, `bi-arrow-counterclockwise` |
 | Edit | `btn btn-sm btn-outline-primary` | `bi-pencil` |
 | Hapus | `btn btn-sm btn-outline-danger` | `bi-trash` |
-| Favorit (konvensi untuk fitur yang direncanakan) | `btn btn-sm btn-warning` (aktif) atau `btn-outline-warning` | `bi-star-fill`, `bi-star` |
+| Pin/Favorit | `btn btn-sm btn-warning` (sudah dipin) atau `btn btn-sm btn-outline-warning` (belum dipin) | `bi-star-fill`, `bi-star`; label `Unpin` atau `Pin` |
 | Batal, reset | `btn btn-light border` | |
 
 Warna status log: tambah `#10b981`, edit `#6366f1`, hapus `#ef4444`, pulihkan `#0ea5e9`, permanen `#6b7280`.

@@ -6,7 +6,7 @@ Fakta sistem ada di `docs/architecture.md` dan `docs/database.md`. Dokumen ini h
 
 ## Wajib
 
-- Satu aksi, satu urutan: **otorisasi, validasi, proses, catat log, redirect dengan pesan**.
+- Satu aksi, satu urutan: **otorisasi, validasi bila menerima input, proses, catat log bila aturan fitur mengharuskannya, redirect dengan pesan**. Pin/unpin Favorit tidak dicatat di Activity Log.
 - Validasi hanya lewat `$request->validate(...)` dengan **pesan bahasa Indonesia**. Pakai data hasil validasi, bukan `$request->all()`.
 - Route baru milik arsip didaftarkan di `routes/web.php` **sebelum** `Route::resource('arsip', ...)`, di grup yang benar (`auth` untuk semua user, `role:admin` untuk khusus Admin).
 - Eager loading (`with`) untuk relasi yang dipakai di view, dan `->paginate(n)->withQueryString()` untuk daftar yang punya filter.
@@ -29,7 +29,7 @@ Fakta sistem ada di `docs/architecture.md` dan `docs/database.md`. Dokumen ini h
 | Route | Bahasa Indonesia, `modul.aksi` | `arsip.index`, `sampah.pulihkan`, `arsip.pin` |
 | Controller | `NamaModulController`. Menu Akun dilayani `UserController` (route `akun`) | `ArsipController`, `SampahController` |
 | Model | Tunggal, PascalCase | `Arsip`, `Kategori`, `ActivityLog` |
-| Tabel | Jamak. Pivot memakai nama eksplisit di relasi bila tidak standar | `arsips`, `kategoris`, `arsip_pin` (rencana Favorit) |
+| Tabel | Jamak. Pivot memakai nama eksplisit di relasi bila tidak standar | `arsips`, `kategoris`, `arsip_pin` (Favorit) |
 | Variabel dan method buatan sendiri | Bahasa Indonesia, camelCase | `$arsipTerbaru`, `hapusPermanen()`, `bersihkanSampahKedaluwarsa()` |
 | Method standar Laravel | Tetap Inggris | `index`, `store`, `update`, `destroy` |
 | Pesan ke pengguna | Kalimat Indonesia diakhiri titik | `Arsip berhasil ditambahkan.` |
@@ -77,7 +77,7 @@ Arsip::with(['kategori', 'pembuat'])
 
 - Filter opsional memakai `when()`, jangan `if` bertingkat.
 - Logika yang dipakai ulang jadi **scope** atau **accessor** di model (`jenis()`, `arsipSaja()`, `ikon`, `bisa_pratinjau`).
-- Untuk fitur penanda per pengguna yang dibuat kelak (misalnya Favorit), gunakan `withExists` untuk status seperti `dipin`; jumlah relasi memakai `withCount`.
+- Untuk status penanda per pengguna seperti Favorit, siapkan nilai di query controller memakai `withExists` (contoh alias `dipin`); jangan query relasi dari Blade. Jumlah relasi memakai `withCount`.
 - `Arsip::query()` otomatis mengecualikan arsip di Sampah. Pakai `onlyTrashed()` untuk halaman Sampah dan `withTrashed()` bila yang di Sampah juga harus dihitung (cek pemakaian kategori atau akun, keunikan nomor).
 - Pencarian teks memakai `like` dengan parameter binding (`where('judul', 'like', "%{$cari}%")`). Jangan menyusun SQL mentah dari input.
 
@@ -86,6 +86,7 @@ Arsip::with(['kategori', 'pembuat'])
 - Selalu isi `$fillable` secara eksplisit. Tambahkan `$casts` bila perlu.
 - `User::arsips()` adalah relasi `hasMany` ke `Arsip` dengan foreign key `created_by`.
 - `User::activityLogs()` adalah relasi `hasMany` ke `ActivityLog` dengan foreign key `user_id`.
+- `User::pins()` dan `Arsip::dipinOleh()` adalah relasi `belongsToMany` melalui pivot `arsip_pin` dengan foreign key `user_id` dan `arsip_id`.
 - Pemeriksaan penghapusan akun memakai kedua relasi tersebut. `arsips()->withTrashed()->exists()` sengaja ikut mendeteksi arsip soft deleted agar akun yang masih punya arsip aktif atau di Sampah tidak terhapus.
 - Daftar tetap yang dipakai banyak tempat jadi **konstanta** (`Arsip::JENIS`, `Arsip::MASA_SAMPAH_HARI`), bukan angka atau array yang diulang.
 - Helper tampilan sederhana (ikon, warna, label) boleh jadi accessor di model.
@@ -112,6 +113,7 @@ Scope `ActivityLog::scopeArsipSaja()` mencocokkan **awalan** kalimat. Kalau mena
 - Migration yang punya foreign key harus bertimestamp **lebih baru** dari tabel yang dirujuk (contoh: `arsips` setelah `kategoris`).
 - Kolom baru di tabel yang sudah berisi data: buat `nullable` atau beri default.
 - Tabel pivot memakai primary key gabungan dan `cascadeOnDelete()`.
+- Pivot Favorit `arsip_pin` menyimpan `created_at` dengan default waktu database dan tidak memiliki `updated_at`; jangan gunakan `withTimestamps()` tanpa memastikan kolom yang dibutuhkan tersedia.
 - Setelah migration: perbarui model (`$fillable`, relasi), `docs/database.md`, dan backup dulu bila datanya penting.
 
 ## Gaya Kode

@@ -41,6 +41,23 @@ public function update(Request $request, Arsip $arsip)
 
 Untuk model atau aturan baru yang bergantung pada kepemilikan, buat policy, jangan menulis `if` role di controller. Setiap endpoint baru diuji sebagai Admin, sebagai User, dan sebagai tamu (harus diarahkan ke login).
 
+Favorit disimpan sebagai pivot, bukan record Favorit mandiri: endpoint arsip
+membatasi baca/tulis pivot lewat relasi user yang sedang login dan memakai
+`ArsipPolicy` untuk izin melihat arsip. Karena itu endpoint tidak menerima ID
+pemilik pin; jangan memperluasnya menjadi akses ke pin akun lain.
+
+### Favorit (Pin)
+
+- `favorit.index`, `arsip.pin`, dan `arsip.unpin` berada di grup `auth`.
+- Pemilik pivot selalu akun yang sedang login (`$request->user()` atau
+  `auth()->user()`); jangan menerima `user_id` dari route atau form.
+- Pin/unpin memeriksa hak `view` arsip yang sudah ada. `ArsipPolicy` tetap
+  menentukan hak edit dan hapus; memiliki pin tidak memberi izin tambahan.
+- Route model binding dan global scope `SoftDeletes` mengecualikan arsip yang
+  sudah masuk Sampah. Relasi Favorit mengambil pivot milik akun itu saja.
+- Gunakan POST untuk pin dan DELETE untuk unpin dengan CSRF. Aksi ini tidak
+  menghasilkan Activity Log.
+
 ## Autentikasi dan Akun
 
 - Login memakai username dan password lewat `Auth::attempt`. Setelah berhasil, `session()->regenerate()`. Saat logout, `invalidate()` dan `regenerateToken()`.
@@ -107,7 +124,7 @@ public function preview(Arsip $arsip)
 
 Aturan:
 - Penghapusan permanen **harus lewat model** (`$arsip->forceDelete()`), supaya event menghapus file fisiknya. Query builder massal membuat file yatim.
-- Backup database serta folder arsip pada disk yang dirujuk record **sebelum** menghapus permanen dalam jumlah banyak (lihat `docs/backup-and-recovery.md`). Selama masih ada salinan lama, pertimbangkan juga `storage/app/public/arsip`.
+- Backup database serta folder arsip pada disk yang dirujuk record **sebelum** menghapus permanen dalam jumlah banyak. Dokumen prosedur backup khusus belum tersedia. Selama masih ada salinan lama, pertimbangkan juga `storage/app/public/arsip`.
 - Kuota penyimpanan di dashboard menghitung semua file di folder `arsip`, termasuk milik arsip di Sampah.
 
 ## Status Private Storage

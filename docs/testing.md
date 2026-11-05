@@ -1,90 +1,44 @@
 # Pengujian
 
-Dokumen ini mencatat pengujian yang benar-benar dijalankan dan cara mengisolasi pengujian database dari database pengembangan.
-
 ## Isolasi database
 
-`phpunit.xml` saat ini mengomentari `DB_CONNECTION` dan `DB_DATABASE`. Karena itu, jangan menjalankan tes yang memakai `RefreshDatabase` tanpa menetapkan database test terpisah. Pengujian relasi penghapusan akun dijalankan dengan SQLite in-memory dari PowerShell:
+`phpunit.xml` tidak menetapkan `DB_CONNECTION` atau `DB_DATABASE`. Sebelum
+menjalankan suite yang memakai `RefreshDatabase`, set lingkungan PowerShell ke
+SQLite in-memory:
 
 ```powershell
 $env:DB_CONNECTION = 'sqlite'
 $env:DB_DATABASE = ':memory:'
-php artisan test tests\Feature\UserDeletionRelationsTest.php
+php artisan test
 ```
 
-Dengan konfigurasi tersebut, `RefreshDatabase` membuat skema hanya di database SQLite in-memory selama proses tes. Pengujian tidak memakai database pengembangan dan tidak mengubah `.env` atau `phpunit.xml`.
+Dengan konfigurasi tersebut, skema tes hanya hidup di SQLite in-memory selama
+proses pengujian. Perintah tidak memakai database pengembangan dan tidak
+mengubah `.env` atau `phpunit.xml`.
 
-## Relasi penghapusan akun
-
-File: `tests/Feature/UserDeletionRelationsTest.php`
-
-Tes mencakup:
-
-- Relasi `User::arsips()` dan `User::activityLogs()` serta foreign key masing-masing.
-- Deteksi arsip aktif dan arsip soft deleted melalui `withTrashed()`.
-- Penolakan penghapusan akun yang memiliki arsip aktif atau di Sampah.
-- Penolakan penghapusan akun yang memiliki activity log.
-- Penghapusan akun tanpa arsip dan log, termasuk log penghapusan yang dicatat untuk admin.
-- Penolakan admin menghapus akunnya sendiri.
-
-Hasil pada **5 November 2026**: **6 tes lulus, 21 assertion**.
-
-## Relasi Pin/Favorit
-
-File: `tests/Feature/ArsipPinRelationsTest.php`
-
-Tes mencakup pembuatan tabel pivot dan foreign key cascade, relasi kedua arah,
-penolakan pin duplikat, cascade saat arsip dihapus permanen atau akun yang
-diizinkan dihapus, serta retensi pivot saat arsip masuk Sampah.
-
-Jalankan terisolasi dari database pengembangan:
+Pemeriksaan Blade dan route yang tidak memerlukan database:
 
 ```powershell
-$env:DB_CONNECTION = 'sqlite'
-$env:DB_DATABASE = ':memory:'
-php artisan test tests\Feature\ArsipPinRelationsTest.php
+php artisan view:cache
+php artisan view:clear
+php artisan route:list
 ```
 
-Hasil pada **5 November 2026**: **7 tes lulus, 23 assertion**.
+## Cakupan tes
 
-## Route dan controller Pin/Favorit
+| File | Cakupan utama |
+|---|---|
+| `tests/Feature/ExampleTest.php` | Root mengarahkan ke dashboard; dashboard mengarahkan guest ke login. |
+| `tests/Feature/ArsipPinRelationsTest.php` | Struktur pivot, relasi, duplikasi, cascade, soft delete. |
+| `tests/Feature/FavoritControllerTest.php` | Guest, Admin/User, privasi pemilik, manipulasi `user_id`, pin/unpin, Sampah/restore, hak arsip, Activity Log. |
+| `tests/Feature/FavoritUiTest.php` | Render halaman, privasi, empty state, form Pin/Unpin, pagination, pencarian. |
+| `tests/Feature/PrivateStorageArsipTest.php` | Upload, preview/download, edit file, siklus Sampah, migrasi storage, dashboard. |
+| `tests/Feature/UserDeletionRelationsTest.php` | Relasi akun, larangan penghapusan, izin penghapusan, akun sendiri. |
+| `tests/Unit/ExampleTest.php` | Assertion dasar PHPUnit. |
 
-File: `tests/Feature/FavoritControllerTest.php`
+## Hasil terakhir
 
-Tes mencakup perlindungan guest, perilaku Admin dan User, isolasi pemilik pin,
-request `user_id` yang diabaikan, pin berulang, unpin idempoten, arsip Sampah
-dan pemulihan, hak edit/hapus arsip yang tetap, serta tidak adanya Activity Log.
-Data daftar diperiksa dari hasil paginasi controller tanpa merender view; view
-Favorit akan dibuat pada tahap UI.
-
-Jalankan terisolasi dari database pengembangan:
-
-```powershell
-$env:DB_CONNECTION = 'sqlite'
-$env:DB_DATABASE = ':memory:'
-php artisan test tests\Feature\FavoritControllerTest.php
-```
-
-Hasil pada **5 November 2026**: **8 tes lulus, 40 assertion**.
-
-## UI Pin/Favorit
-
-File: `tests/Feature/FavoritUiTest.php`
-
-Tes mencakup render halaman untuk Admin dan User dengan data terpisah, empty
-state, route dan method form pin/unpin pada daftar dan detail arsip, pagination,
-serta pencarian daftar Favorit.
-
-Jalankan terisolasi dari database pengembangan:
-
-```powershell
-$env:DB_CONNECTION = 'sqlite'
-$env:DB_DATABASE = ':memory:'
-php artisan test tests\Feature\FavoritUiTest.php
-```
-
-Hasil pada **5 November 2026**: **5 tes lulus, 32 assertion**.
-
-Pengujian gabungan Tahap 1–3 pada **5 November 2026**: **20 tes lulus,
-95 assertion**. `php artisan view:cache` dan `php artisan view:clear` juga
-berhasil dijalankan.
+Pada **5 November 2026**, seluruh suite menghasilkan **38 tes lulus dan 169
+assertion**, tanpa tes gagal. `php artisan view:cache` dan
+`php artisan view:clear` berhasil; `php artisan route:list` juga berhasil dan
+menampilkan 38 route.
