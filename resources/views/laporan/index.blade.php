@@ -84,9 +84,9 @@
                 <div class="text-muted small mb-2">Per Kategori</div>
                 <div class="d-flex flex-wrap gap-2">
                     @forelse($perKategori as $row)
-                        <span class="badge text-bg-light border fs-6 fw-medium">
+                        <x-kategori-badge :nama="$row->kategori->nama" class="fs-6">
                             {{ $row->kategori->nama }}: {{ $row->jumlah }}
-                        </span>
+                        </x-kategori-badge>
                     @empty
                         <span class="text-muted">-</span>
                     @endforelse
@@ -115,7 +115,7 @@
                                 <td data-label="No">{{ $arsips->firstItem() + $loop->index }}</td>
                                 <td data-label="No. Arsip">{{ $arsip->nomor_arsip }}</td>
                                 <td data-label="Judul">{{ $arsip->judul }}</td>
-                                <td data-label="Kategori"><span class="badge text-bg-light border">{{ $arsip->kategori->nama }}</span></td>
+                                <td data-label="Kategori"><x-kategori-badge :nama="$arsip->kategori->nama" /></td>
                                 <td data-label="Tanggal">{{ $arsip->tanggal_arsip->format('d M Y') }}</td>
                                 <td data-label="Dibuat Oleh">{{ $arsip->pembuat->nama ?? '-' }}</td>
                             </tr>

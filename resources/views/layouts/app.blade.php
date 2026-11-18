@@ -122,6 +122,25 @@
         .table tbody tr:hover td { background: #f8f9ff; }
 
         .badge { font-weight: 500; }
+        .badge.badge-kategori {
+            padding: .25rem .5rem;
+            border: 1px solid #E2E8F0;
+            border-radius: 6px;
+            color: #475569;
+            background-color: #F1F5F9;
+            font-size: .75rem;
+            font-weight: 500;
+            line-height: 1.25;
+            vertical-align: middle;
+        }
+        .badge.badge-kategori--surat-masuk { color: #1D4ED8; border-color: #BFDBFE; background-color: #DBEAFE; }
+        .badge.badge-kategori--laporan { color: #6D28D9; border-color: #DDD6FE; background-color: #EDE9FE; }
+        .badge.badge-kategori--surat-kerja-sama { color: #15803D; border-color: #BBF7D0; background-color: #DCFCE7; }
+
+        @media print {
+            .badge.badge-kategori { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+        }
+
         .alert { border: 0; border-radius: .8rem; }
         .modal-content { border: 0; border-radius: 1rem; }
 

@@ -71,7 +71,7 @@
                                         @endif
                                         {{ $arsip->judul }}
                                     </td>
-                                    <td data-label="Kategori"><span class="badge text-bg-light border">{{ $arsip->kategori->nama }}</span></td>
+                                    <td data-label="Kategori"><x-kategori-badge :nama="$arsip->kategori->nama" /></td>
                                     <td data-label="Dihapus" class="text-nowrap">{{ $arsip->deleted_at->format('d M Y, H:i') }}</td>
                                     <td data-label="Sisa Waktu">
                                         <span class="badge {{ $sisa <= 7 ? 'text-bg-danger' : 'text-bg-light border' }}">

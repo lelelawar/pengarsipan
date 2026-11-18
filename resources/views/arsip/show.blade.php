@@ -54,7 +54,7 @@
                 <dd class="col-sm-9">{{ $arsip->nomor_arsip }}</dd>
 
                 <dt class="col-sm-3">Kategori</dt>
-                <dd class="col-sm-9">{{ $arsip->kategori->nama }}</dd>
+                <dd class="col-sm-9"><x-kategori-badge :nama="$arsip->kategori->nama" /></dd>
 
                 <dt class="col-sm-3">Tanggal Arsip</dt>
                 <dd class="col-sm-9">{{ $arsip->tanggal_arsip->format('d F Y') }}</dd>

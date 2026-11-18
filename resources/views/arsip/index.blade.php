@@ -75,7 +75,7 @@
                                     @endif
                                     {{ $arsip->judul }}
                                 </td>
-                                <td data-label="Kategori"><span class="badge text-bg-light border">{{ $arsip->kategori->nama }}</span></td>
+                                <td data-label="Kategori"><x-kategori-badge :nama="$arsip->kategori->nama" /></td>
                                 <td data-label="Tanggal">{{ $arsip->tanggal_arsip->format('d M Y') }}</td>
                                 <td data-label="Dibuat Oleh">{{ $arsip->pembuat->nama ?? '-' }}</td>
                                 <td data-label="Favorit">
