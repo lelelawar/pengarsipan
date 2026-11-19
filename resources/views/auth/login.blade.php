@@ -43,6 +43,45 @@
             background: linear-gradient(125deg, #07111f, #0a1c35, #101b3d, #071827, #07111f);
             background-size: 280% 280%;
             animation: gradient-drift 24s ease-in-out infinite;
+            --pointer-x: 50%;
+            --pointer-y: 50%;
+            --ripple-strength: 0;
+        }
+
+        .auth-liquid {
+            position: absolute;
+            z-index: -1;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 28rem 22rem at var(--pointer-x) var(--pointer-y), rgba(50, 171, 232, var(--ripple-strength)), transparent 72%),
+                radial-gradient(ellipse 19rem 14rem at calc(var(--pointer-x) + 8%) calc(var(--pointer-y) - 7%), rgba(130, 104, 255, var(--ripple-strength)), transparent 74%);
+            transition: background 180ms ease-out;
+        }
+
+        .auth-liquid::before,
+        .auth-liquid::after {
+            position: absolute;
+            content: "";
+            inset: -18%;
+            pointer-events: none;
+            will-change: transform, opacity;
+        }
+
+        .auth-liquid::before {
+            opacity: .55;
+            background: repeating-radial-gradient(ellipse at var(--pointer-x) var(--pointer-y), transparent 0 44px, rgba(103, 217, 244, .055) 46px 48px, transparent 51px 78px);
+            transform: scale(1);
+            transition: opacity .65s ease, transform .8s ease-out;
+            animation: liquid-current 32s ease-in-out infinite alternate;
+        }
+
+        .auth-liquid::after {
+            opacity: .22;
+            background: radial-gradient(ellipse 45% 32% at 28% 72%, rgba(18, 111, 190, .18), transparent 72%), radial-gradient(ellipse 34% 28% at 77% 25%, rgba(92, 79, 196, .16), transparent 74%);
+            transform: translate3d(0, 0, 0);
+            transition: transform 1.2s ease-out;
         }
 
         .auth-scene::before,
@@ -91,9 +130,15 @@
             padding: clamp(1.5rem, 5vw, 2.75rem);
             border: 1px solid rgba(185, 211, 255, .16);
             border-radius: 1.5rem;
-            background: linear-gradient(145deg, rgba(20, 36, 59, .97), rgba(12, 25, 44, .97));
-            box-shadow: 0 28px 80px rgba(0, 0, 0, .4), inset 0 1px 0 rgba(255, 255, 255, .045);
+            background: linear-gradient(145deg, rgba(20, 43, 68, .78), rgba(12, 27, 49, .72));
+            -webkit-backdrop-filter: blur(20px) saturate(135%);
+            backdrop-filter: blur(20px) saturate(135%);
+            box-shadow: 0 28px 80px rgba(0, 0, 0, .38), inset 0 1px 0 rgba(255, 255, 255, .12), inset 0 0 28px rgba(103, 217, 244, .035), 0 0 34px rgba(82, 122, 220, .07);
             animation: card-enter .7s cubic-bezier(.2, .75, .25, 1) both;
+        }
+
+        @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+            .auth-card { background: linear-gradient(145deg, rgba(20, 39, 63, .96), rgba(12, 25, 44, .95)); }
         }
 
         .brand-mark {
@@ -129,7 +174,7 @@
             min-height: 3.15rem;
             border-color: rgba(173, 196, 229, .18);
             color: var(--auth-ink);
-            background-color: rgba(5, 15, 29, .55);
+            background-color: rgba(5, 15, 29, .46);
             transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
         }
 
@@ -142,7 +187,7 @@
         .auth-input-group:focus-within .input-group-text,
         .auth-input-group:focus-within .form-control {
             border-color: rgba(103, 217, 244, .78);
-            background-color: rgba(6, 19, 35, .92);
+            background-color: rgba(6, 19, 35, .84);
         }
 
         .auth-input-group:focus-within .form-control { box-shadow: none; }
@@ -180,6 +225,7 @@
         .btn-auth:focus-visible { outline: 3px solid rgba(148, 234, 255, .85); outline-offset: 3px; }
 
         @keyframes gradient-drift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+        @keyframes liquid-current { from { transform: translate3d(-1.2%, -.7%, 0) scale(1); } to { transform: translate3d(1.2%, .7%, 0) scale(1.035); } }
         @keyframes orb-float { from { transform: translate3d(-10px, -12px, 0) scale(.96); } to { transform: translate3d(18px, 16px, 0) scale(1.04); } }
         @keyframes card-enter { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -190,11 +236,13 @@
 
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+            .auth-liquid { display: none; }
         }
     </style>
 </head>
 <body>
 <main class="auth-scene">
+    <div class="auth-liquid" aria-hidden="true"></div>
     <span class="auth-orb" aria-hidden="true"></span>
 
     <section class="auth-card" aria-labelledby="auth-title">
@@ -258,6 +306,56 @@
             icon.classList.toggle('bi-eye', !tampil);
             icon.classList.toggle('bi-eye-slash', tampil);
         });
+
+        const scene = document.querySelector('.auth-scene');
+        const card = document.querySelector('.auth-card');
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+
+        if (!reducedMotion.matches && finePointer.matches) {
+            let targetX = 50;
+            let targetY = 50;
+            let targetStrength = 0;
+            let currentX = 50;
+            let currentY = 50;
+            let currentStrength = 0;
+            let frame = 0;
+
+            function animateLiquid() {
+                frame = 0;
+                currentX += (targetX - currentX) * .12;
+                currentY += (targetY - currentY) * .12;
+                currentStrength += (targetStrength - currentStrength) * .1;
+
+                scene.style.setProperty('--pointer-x', currentX.toFixed(2) + '%');
+                scene.style.setProperty('--pointer-y', currentY.toFixed(2) + '%');
+                scene.style.setProperty('--ripple-strength', currentStrength.toFixed(3));
+
+                if (Math.abs(targetX - currentX) > .08 || Math.abs(targetY - currentY) > .08 || Math.abs(targetStrength - currentStrength) > .005) {
+                    frame = requestAnimationFrame(animateLiquid);
+                }
+            }
+
+            scene.addEventListener('pointermove', function (event) {
+                const bounds = scene.getBoundingClientRect();
+                targetX = Math.max(0, Math.min(100, ((event.clientX - bounds.left) / bounds.width) * 100));
+                targetY = Math.max(0, Math.min(100, ((event.clientY - bounds.top) / bounds.height) * 100));
+
+                const cardBounds = card.getBoundingClientRect();
+                const centerX = cardBounds.left + cardBounds.width / 2;
+                const centerY = cardBounds.top + cardBounds.height / 2;
+                const distance = Math.hypot(event.clientX - centerX, event.clientY - centerY);
+                const influence = Math.max(cardBounds.width, cardBounds.height) * 1.25;
+                targetStrength = Math.max(0, 1 - distance / influence);
+
+                if (!frame) frame = requestAnimationFrame(animateLiquid);
+            }, { passive: true });
+
+            scene.addEventListener('pointerleave', function () {
+                targetStrength = 0;
+                if (!frame) frame = requestAnimationFrame(animateLiquid);
+            }, { passive: true });
+        }
     })();
 </script>
 </body>
