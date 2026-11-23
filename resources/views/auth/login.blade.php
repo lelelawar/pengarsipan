@@ -170,6 +170,13 @@
 
         .auth-title { color: var(--auth-ink); font-size: clamp(1.65rem, 5vw, 1.9rem); letter-spacing: -.04em; }
         .auth-description { color: var(--auth-muted); font-size: .94rem; }
+        .auth-version {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.65);
+            letter-spacing: 1px;
+        }
 
         .form-label { margin-bottom: .5rem; color: #dce6f5; font-size: .86rem; font-weight: 600; }
 
@@ -298,6 +305,7 @@
             <button type="submit" class="btn btn-auth w-100">Masuk <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></button>
         </form>
     </section>
+    <div class="auth-version">SIKAD v.1</div>
 </main>
 
 <script>
