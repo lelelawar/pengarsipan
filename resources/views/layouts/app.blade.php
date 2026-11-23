@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Dashboard') - Pengarsipan</title>
+    <title>@yield('title', 'Dashboard') SIKAD </title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -207,7 +207,7 @@
 <aside class="sidebar" id="sidebar">
     <div class="brand">
         <div class="brand-logo"><i class="bi bi-archive-fill"></i></div>
-        <div>Pengarsipan<small>Arsip digital internal</small></div>
+        <div>SIKAD<small>Sistem Informasi Kearsipan Digital</small></div>
     </div>
 
     <nav class="nav flex-column">

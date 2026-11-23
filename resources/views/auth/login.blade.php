@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#07111f">
-    <title>Masuk - Pengarsipan</title>
+    <title>Login - SIKAD</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -141,12 +141,14 @@
             .auth-card { background: linear-gradient(145deg, rgba(20, 39, 63, .96), rgba(12, 25, 44, .95)); }
         }
 
+        .auth-brand { text-align: center; }
+
         .brand-mark {
             display: grid;
             width: 3.25rem;
             height: 3.25rem;
             place-items: center;
-            margin-bottom: 1.5rem;
+            margin: 0 auto 1.5rem;
             border: 1px solid rgba(103, 217, 244, .25);
             border-radius: 1rem;
             color: #9ceafa;
@@ -246,10 +248,12 @@
     <span class="auth-orb" aria-hidden="true"></span>
 
     <section class="auth-card" aria-labelledby="auth-title">
-        <div class="brand-mark" aria-hidden="true"><i class="bi bi-archive-fill"></i></div>
-        <p class="auth-eyebrow">Pengarsipan</p>
-        <h1 class="auth-title fw-bold mb-2" id="auth-title">Selamat datang</h1>
-        <p class="auth-description mb-4">Masuk untuk mengelola arsip Anda dengan aman.</p>
+        <div class="auth-brand">
+            <div class="brand-mark" aria-hidden="true"><i class="bi bi-archive-fill"></i></div>
+            <p class="auth-eyebrow">Sistem Informasi Kearsipan Digital</p>
+            <h1 class="auth-title fw-bold mb-2" id="auth-title">SIKAD</h1>
+            <p class="auth-description mb-4">Masuk untuk mengelola arsip Anda dengan aman.</p>
+        </div>
 
         @error('username')
             <div class="alert auth-alert py-2 px-3 mb-4" role="alert">
