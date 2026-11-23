@@ -149,6 +149,7 @@
             height: 3.25rem;
             place-items: center;
             margin: 0 auto 1.5rem;
+            padding: .25rem;
             border: 1px solid rgba(103, 217, 244, .25);
             border-radius: 1rem;
             color: #9ceafa;
@@ -156,6 +157,7 @@
             box-shadow: 0 8px 24px rgba(25, 150, 202, .12);
             font-size: 1.5rem;
         }
+        .brand-mark img { width: 100%; height: 100%; object-fit: contain; }
 
         .auth-eyebrow {
             margin-bottom: .45rem;
@@ -249,10 +251,12 @@
 
     <section class="auth-card" aria-labelledby="auth-title">
         <div class="auth-brand">
-            <div class="brand-mark" aria-hidden="true"><i class="bi bi-archive-fill"></i></div>
+            <div class="brand-mark">
+                <img src="{{ asset('images/logo-kapal.png') }}" alt="Logo SIKAD">
+            </div>
             <p class="auth-eyebrow">Sistem Informasi Kearsipan Digital</p>
             <h1 class="auth-title fw-bold mb-2" id="auth-title">SIKAD</h1>
-            <p class="auth-description mb-4">Masuk untuk mengelola arsip Anda dengan aman.</p>
+            <p class="auth-description mb-4">Masuk untuk mengelola arsip Anda.</p>
         </div>
 
         @error('username')

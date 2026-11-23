@@ -38,8 +38,9 @@
         .brand-logo {
             width: 40px; height: 40px; border-radius: .8rem;
             background: rgba(255, 255, 255, .14);
-            display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+            display: flex; align-items: center; justify-content: center; padding: .25rem;
         }
+        .brand-logo img { width: 100%; height: 100%; object-fit: contain; }
         .brand small { display: block; font-weight: 400; font-size: .72rem; color: #a5b4fc; }
 
         .menu-label { font-size: .68rem; letter-spacing: .1em; color: rgba(199, 210, 254, .5); padding: 1rem .75rem .4rem; text-transform: uppercase; }
@@ -53,8 +54,18 @@
         .sidebar .nav-link:hover { background: rgba(255, 255, 255, .08); color: #fff; }
         .sidebar .nav-link.active { background: rgba(255, 255, 255, .15); color: #fff; box-shadow: inset 3px 0 0 #a5b4fc; }
 
+        .sidebar-date {
+            display: flex; align-items: center; gap: .75rem;
+            margin-top: auto; padding: .7rem .8rem;
+            border: 1px solid rgba(199, 210, 254, .12); border-radius: .8rem;
+            color: #c7d2fe; background: rgba(255, 255, 255, .045);
+        }
+        .sidebar-date > i { color: #a5b4fc; font-size: 1.1rem; }
+        .sidebar-date-day { color: #fff; font-size: .88rem; font-weight: 600; line-height: 1.3; }
+        .sidebar-date-full { color: #c7d2fe; font-size: .75rem; line-height: 1.35; }
+
         .user-box {
-            margin-top: auto; padding: .9rem;
+            margin-top: .75rem; padding: .9rem;
             background: rgba(255, 255, 255, .08);
             border-radius: .9rem;
         }
@@ -206,7 +217,7 @@
 
 <aside class="sidebar" id="sidebar">
     <div class="brand">
-        <div class="brand-logo"><i class="bi bi-archive-fill"></i></div>
+        <div class="brand-logo"><img src="{{ asset('images/logo-kapal.png') }}" alt="Logo SIKAD"></div>
         <div>SIKAD<small>Sistem Informasi Kearsipan Digital</small></div>
     </div>
 
@@ -254,6 +265,14 @@
             </a>
         @endif
     </nav>
+
+    <div class="sidebar-date" aria-label="Hari dan tanggal zona waktu WIB">
+        <i class="bi bi-calendar3" aria-hidden="true"></i>
+        <div>
+            <div class="sidebar-date-day" id="sidebarDateDay"></div>
+            <div class="sidebar-date-full" id="sidebarDateFull"></div>
+        </div>
+    </div>
 
     <div class="user-box">
         <div class="d-flex align-items-center gap-2 mb-3">
@@ -329,6 +348,24 @@
     backdrop.addEventListener('click', () => setSidebar(false));
     sidebar.querySelectorAll('a.nav-link').forEach(a => a.addEventListener('click', () => setSidebar(false)));
     window.addEventListener('resize', () => { if (window.innerWidth >= 992) setSidebar(false); });
+
+    const dateDay = document.getElementById('sidebarDateDay');
+    const dateFull = document.getElementById('sidebarDateFull');
+    const dayFormatter = new Intl.DateTimeFormat('id-ID', {
+        timeZone: 'Asia/Jakarta', weekday: 'long'
+    });
+    const dateFormatter = new Intl.DateTimeFormat('id-ID', {
+        timeZone: 'Asia/Jakarta', day: 'numeric', month: 'long', year: 'numeric'
+    });
+
+    function updateSidebarDate() {
+        const now = new Date();
+        dateDay.textContent = dayFormatter.format(now);
+        dateFull.textContent = dateFormatter.format(now);
+    }
+
+    updateSidebarDate();
+    window.setInterval(updateSidebarDate, 60 * 1000);
 </script>
 @stack('scripts')
 </body>
